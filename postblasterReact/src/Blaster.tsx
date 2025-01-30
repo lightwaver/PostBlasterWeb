@@ -61,6 +61,7 @@ const Blaster = () => {
     const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
             const inputValue = event.currentTarget.value;
+            event.currentTarget.value = ""; // Clear the input field
             setBarcodes((prevBarcodes) => {
                 var found = barcodes.find(barcode => barcode.content === inputValue);
                 if (found) {

@@ -3,3 +3,4 @@ node_modules
 postblasterReact/node_modules
 postblasterReact/yarn.lock
 *.tsbuildinfo
+postblasterReact/build

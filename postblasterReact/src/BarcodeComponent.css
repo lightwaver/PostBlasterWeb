@@ -1,0 +1,12 @@
+.starship {
+  position: relative;
+  /* background: url('/path/to/starship.png') no-repeat center center; */
+  background-size: contain;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.starship svg {
+  width: 200px;
+}

@@ -1,10 +1,19 @@
 {
-  "compilerOptions": {
-    "jsx": "react",
-    // ...existing code...
-    "resolve": {
-      "extensions": [".tsx", ".ts", ".js", ".json"]
+    "compilerOptions": {
+        "jsx": "react",
+        // ...existing code...
+        "compilerOptions": {
+            // other options
+            "esModuleInterop": true
+        },
+        "resolve": {
+            "extensions": [
+                ".tsx",
+                ".ts",
+                ".js",
+                ".json"
+            ]
+        }
     }
-  }
-  // ...existing code...
+    // ...existing code...
 }

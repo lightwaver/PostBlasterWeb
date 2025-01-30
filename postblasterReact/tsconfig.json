@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    // ...existing code...
+    "resolve": {
+      "extensions": [".tsx", ".ts", ".js", ".json"]
+    }
+  }
+  // ...existing code...
+}

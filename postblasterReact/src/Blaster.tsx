@@ -65,7 +65,7 @@ const Blaster = () => {
             setBarcodes((prevBarcodes) => {
                 var found = barcodes.find(barcode => barcode.content === inputValue);
                 if (found) {
-                    const p = scanTimeout - (new Date().valueOf() - found.createdAt.valueOf());
+                    const p = (scanTimeout - (new Date().valueOf() - found.createdAt.valueOf()) / 100);
                     setPoints(points + p);
                 }
                 return prevBarcodes.filter(barcode => barcode.content !== inputValue);

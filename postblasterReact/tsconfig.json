@@ -1,11 +1,7 @@
 {
     "compilerOptions": {
         "jsx": "react",
-        // ...existing code...
-        "compilerOptions": {
-            // other options
-            "esModuleInterop": true
-        },
+        "esModuleInterop": true,
         "resolve": {
             "extensions": [
                 ".tsx",
@@ -13,7 +9,11 @@
                 ".js",
                 ".json"
             ]
-        }
+        },
+        "strict": true,
+        "sourceMap": true,
+        "incremental": true,
+        "moduleResolution": "node",
+        "typeRoots": ["./node_modules/@types"]
     }
-    // ...existing code...
 }

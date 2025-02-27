@@ -2,6 +2,11 @@ import React, { useState, useRef, useEffect } from "react";
 import "./Blaster.css";
 import BarcodeComponent from "./BarcodeComponent";
 
+declare var CSharpBridge : {
+        print: (message: string) => void;
+    };
+
+
 declare interface BarcodEntry {
     content: string, 
     x: number, 
@@ -24,8 +29,8 @@ const Blaster = () => {
 
     function getBarcode() {
         const x = Math.random() * 90; // Random x position (0-90%)
-        const y = Math.random() * 90; // Random y position (0-90%)
-        const newItem = { content: `Ship ${barcodeCount++}`, x, y, createdAt: new Date() };
+        const y = Math.random() * 70; // Random y position (0-90%)
+        const newItem = { content: `ship${barcodeCount++}`, x, y, createdAt: new Date() };
         return newItem;
     }
 
@@ -42,6 +47,11 @@ const Blaster = () => {
             setGameOverCss(barcodes.length > 0 ? "gameOver" : "winner");
             setGameOverText(barcodes.length > 0 ? "Game Over" : "Winner!");
             setBarcodes([]);
+
+            const name = prompt("Game Over! Your score is " + points + "\r\n Enter your Name:" );
+
+            CSharpBridge.print(name + "\n Score:" + points);
+
             setShowButton(true);
         }
     };
@@ -65,7 +75,7 @@ const Blaster = () => {
             setBarcodes((prevBarcodes) => {
                 var found = barcodes.find(barcode => barcode.content === inputValue);
                 if (found) {
-                    const p = (scanTimeout - (new Date().valueOf() - found.createdAt.valueOf()) / 100);
+                    const p = Math.floor(scanTimeout - (new Date().valueOf() - found.createdAt.valueOf()) / 100);
                     setPoints(points + p);
                 }
                 return prevBarcodes.filter(barcode => barcode.content !== inputValue);
@@ -84,11 +94,13 @@ const Blaster = () => {
                 {barcodes.map((barcode, index) => (
                     <div key={`${barcode.content}-${barcode.x}-${barcode.y}`}
                         style={{ position: 'absolute', top: `${barcode.y}%`, left: `${barcode.x}%` }}>
-                        <BarcodeComponent content={barcode.content} />
+                        <img src={'./ships/' + barcode.content + '.png'} style={{height:'120px'}} /><br/>
+                        <span style={{width:"100%", textAlign:"center"}}>{barcode.content}</span>
                     </div>
                 ))}
             </div>
             <input type="text" className="textbox" placeholder="Scan here..." ref={textboxRef} onKeyPress={handleKeyPress} />
+            <input type="button" onClick={()=> CSharpBridge.print("TestPrint!")} style={{width:"100px"}} />
         </div>
     );
 };

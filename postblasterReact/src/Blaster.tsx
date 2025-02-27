@@ -2,21 +2,23 @@ import React, { useState, useRef, useEffect } from "react";
 import "./Blaster.css";
 import BarcodeComponent from "./BarcodeComponent";
 
-declare var CSharpBridge : {
-        print: (message: string) => void;
-    };
+declare var CSharpBridge: {
+    print: (message: string) => void;
+};
 
 
 declare interface BarcodEntry {
-    content: string, 
-    x: number, 
+    content: string,
+    x: number,
     y: number,
     createdAt: Date
 }
 
-const scanTimeout = 5000;
+const scanTimeout = 3000;
 let barcodeCount = 0;
-const maxbarcodes = 10;
+const maxbarcodes = 30;
+let currentPoints = 0;
+
 let timer: NodeJS.Timeout;
 const Blaster = () => {
     const [showButton, setShowButton] = useState(true);
@@ -30,7 +32,7 @@ const Blaster = () => {
     function getBarcode() {
         const x = Math.random() * 90; // Random x position (0-90%)
         const y = Math.random() * 70; // Random y position (0-90%)
-        const newItem = { content: `ship${barcodeCount++}`, x, y, createdAt: new Date() };
+        const newItem = { content: `ship${barcodeCount++ % 10}`, x, y, createdAt: new Date() };
         return newItem;
     }
 
@@ -38,25 +40,38 @@ const Blaster = () => {
         clearTimeout(timer);
         countdown = countdown - 1;
         setCountdown(countdown);
+
         if (barcodeCount < maxbarcodes) {
             const bc = getBarcode();
-            barcodes = [... barcodes.filter(bc => (new Date().valueOf() - bc.createdAt.valueOf()) < scanTimeout ), bc];
+            barcodes = [...barcodes.filter(bc => (new Date().valueOf() - bc.createdAt.valueOf()) < scanTimeout), bc];
             timer = setTimeout(timeTick, 1000);
             setBarcodes(barcodes);
         } else {
-            setGameOverCss(barcodes.length > 0 ? "gameOver" : "winner");
-            setGameOverText(barcodes.length > 0 ? "Game Over" : "Winner!");
             setBarcodes([]);
-
-            const name = prompt("Game Over! Your score is " + points + "\r\n Enter your Name:" );
-
-            CSharpBridge.print(name + "\n Score:" + points);
-
-            setShowButton(true);
+            setTimeout(() => {
+                const p = currentPoints.valueOf().toString();
+                setGameOverCss(barcodes.length > 0 ? "gameOver" : "winner");
+                setGameOverText(barcodes.length > 0 ? "Game Over" : "Winner!");
+                const name = prompt("Game Over! Your score is " + p + "\r\n Enter your Name:");
+                try {
+                    if (name && CSharpBridge)
+                        CSharpBridge.print(name + "\n Score:" + p);
+                } catch (e) {
+                    console.error(e);
+                }
+                setShowButton(true);
+                    
+            }, 300);
         }
     };
 
-    function startClicked ()  {
+    function rePrint() {
+        const p = prompt("points");
+        const name = prompt("name");
+        CSharpBridge.print(name + "\n Score:" + p);
+    }
+
+    function startClicked() {
         setPoints(0);
         countdown = maxbarcodes;
         setCountdown(maxbarcodes);
@@ -88,19 +103,27 @@ const Blaster = () => {
         <div className="blaster-container">
             <div className="playground">
                 {gameOverText && <div className={`game-over-text ${gameOverCss}`}>{gameOverText}</div>}
-                {showButton && <button className="start-button" onClick={startClicked}>Start</button>}
+                {showButton &&
+                    <div style={{ textAlign: "center" }}>
+                        <h3>Scan the barcodes of the shown spaceships as fast as possible to earn points.</h3>
+                        <p>In the end you can enter your Name and your Highscore is printed out on the mobile printer</p>
+                        <button className="start-button" onClick={startClicked}>Start</button>
+                        <br />
+                        <small>Kudos to <i>the Sprinters</i> who started with the App PoC Project.</small>
+                    </div>
+                }
                 <div className="countdown">{countdown}</div>
-                <div className="points">{points}</div>
+                <div className="points">{currentPoints = points}</div>
                 {barcodes.map((barcode, index) => (
                     <div key={`${barcode.content}-${barcode.x}-${barcode.y}`}
                         style={{ position: 'absolute', top: `${barcode.y}%`, left: `${barcode.x}%` }}>
-                        <img src={'./ships/' + barcode.content + '.png'} style={{height:'120px'}} /><br/>
-                        <span style={{width:"100%", textAlign:"center"}}>{barcode.content}</span>
+                        <img src={'./ships/' + barcode.content + '.png'} style={{ height: '120px' }} /><br />
+                        <span style={{ width: "100%", textAlign: "center" }}>{barcode.content}</span>
                     </div>
                 ))}
             </div>
             <input type="text" className="textbox" placeholder="Scan here..." ref={textboxRef} onKeyPress={handleKeyPress} />
-            <input type="button" onClick={()=> CSharpBridge.print("TestPrint!")} style={{width:"100px"}} />
+            <input type="button" onClick={rePrint} style={{ width: "100px" }} value="--" />
         </div>
     );
 };
